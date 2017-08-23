@@ -1,12 +1,14 @@
 ## 前言
 使用饿了么前端的vue组件vue-infinite-scroll。
 调用代码如下:
+```
 <div v-infinite-scroll="loadMore()"loadMore()
      infinite-scroll-disabled="busy"
      infinite-scroll-distance="20">
 	<li v-for="item in listData"><span>{{ item }}</span></li>
 </div>
-发现会无限加载。这个问题也被提了[issue](https://github.com/ElemeFE/vue-infinite-scroll/issues/35);
+```
+发现会无限加载。这个问题也被提了:[issue](https://github.com/ElemeFE/vue-infinite-scroll/issues/35)
 解决方法很简单loadMore()改成loadMore。本文探讨产生这个问题的原因。
 
 ## 找寻原因
@@ -24,8 +26,8 @@
   output = compiler.parseComponent(content, { pad: 'line' })
   ```
   对template解析会得到render函数。得到的代码如下：
-  ![image](https://github.com/seulike/blog/blob/master/img/loadMore1.png)
-  其中查看vue-template-compiler源码。genDirectives方法会对指令进行相应处理。
+  ![image](https://github.com/seulike/blog/blob/master/img/loadMore1.png)   
+  其中查看vue-template-compiler源码。genDirectives方法会对指令进行相应处理。
   ```
   res += "{name:\"" + (dir.name) + "\",rawName:\"" + (dir.rawName) + "\"" + (dir.value ? (",value:(" + (dir.value) + "),expression:" + (JSON.stringify(dir.value))) : '') + ...
   ```
