@@ -1,7 +1,7 @@
 ## 前言
 使用饿了么前端的vue组件vue-infinite-scroll。
 调用代码如下:
-<div v-infinite-scroll="loadMore()"
+<div v-infinite-scroll="loadMore()"loadMore()
      infinite-scroll-disabled="busy"
      infinite-scroll-distance="20">
 	<li v-for="item in listData"><span>{{ item }}</span></li>
@@ -25,6 +25,19 @@
   ```
   对template解析会得到render函数。得到的代码如下：
   ![image](https://github.com/seulike/blog/blob/master/img/loadMore1.png)
+  vue组件的生命周期在官网上有说明。对组件的初始化在方法Vue.prototype._init。里面组件会经历beforeCreate,Observe Data,Init Events,created等阶段。
+  最后会调用mountComponent方法。
+  ```
+  updateComponent = () => {
+      vm._update(vm._render(), hydrating)
+    }
+  vm._watcher = new Watcher(vm, updateComponent, noop)
+  ```
+  这里会设置updateComponent方法。并添加新的watcher。这样一旦数据进行了更新就会调用updateComponent。而updateComponent会调用到render函数，
+  而render函数里面会调用loadMore()，导致数据更新。如此循环。
+  
+  
+  
   
   
   
