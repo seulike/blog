@@ -21,13 +21,22 @@
 
 ## 变量的查找及闭包的产生
   如果一个函数访问了它的外部变量，它就是一个闭包。在10.3.1节标识符（Identifier）的解析中给出了访问闭包的原理。 
-1.设置env=运行的执行上下文的LexicalEnvironment。 
-2.调用10.2.2.1节中定义的GetIdentifierReference(lex,Identifier,strict)
+  1. 设置env=运行的执行上下文的LexicalEnvironment。 
+2. 调用10.2.2.1节中定义的GetIdentifierReference(lex,Identifier,strict)
 GetIdentifierReference主要就是根据lex的环境记录找到对应标识符的值。如若没有，则将lex设置为outer environment reference继续递归调用自身。
 如若lex == null，return undefined。
   闭包就是由此产生的。在当前的LexicalEnvironment中无法找到变量时就会递归的从outer environment reference继续寻找。因而就可以访问了它的外部变量。
 ## 浏览器实现
-  闭包产生的关键就在于生成函数对象时会设置其[[Scope]]属性为正在运行的执行上下文的词法环境。因而形成作用域链。可以沿着作用域链查询变量。
-  
+  闭包产生的关键就在于生成函数对象时会设置其[[Scope]]属性为正在运行的执行上下文的词法环境。因而形成作用域链。可以沿着作用域链查询变量。 
+  chrome中执行一段测试代码： 
+  ```
+  function test(){
+    var data = 23;
+    function inner(){
+        return data + 23;
+    }
+    console.log(inner.prototype);
+  }
+  test();```
   
  
