@@ -31,12 +31,17 @@ GetIdentifierReference主要就是根据lex的环境记录找到对应标识符�
   chrome中执行一段测试代码： 
   ```
   function test(){
+    var str = '';
     var data = 23;
     function inner(){
-        return data + 23;
+        print(data + 23);
     }
-    console.log(inner.prototype);
+    function print(para){
+        console.log(para);
+    }
+    return inner;
   }
   test();```
-  
+  [在chrome中的实现](https://github.com/seulike/blog/blob/master/img/closure1.png)
+  在inner处断点调试，查看变量值，根据图可以看到函数对象上都有[[Scopes]],里面保存了闭包变量。inner与print的值相同。这应该是chrome的v8引擎的实现特点。
  
