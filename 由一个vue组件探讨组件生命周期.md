@@ -25,6 +25,11 @@
   ```
   对template解析会得到render函数。得到的代码如下：
   ![image](https://github.com/seulike/blog/blob/master/img/loadMore1.png)
+  其中查看vue-template-compiler源码。genDirectives方法会对指令进行相应处理。
+  ```
+  res += "{name:\"" + (dir.name) + "\",rawName:\"" + (dir.rawName) + "\"" + (dir.value ? (",value:(" + (dir.value) + "),expression:" + (JSON.stringify(dir.value))) : '') + ...
+  ```
+  其中由于属性value直接使用了loadMore(),而属性expression则使用了字符串"loadMore()"。因而导致调用render方法是会调用loadMore()。
   vue组件的生命周期在官网上有说明。对组件的初始化在方法Vue.prototype._init。里面组件会经历beforeCreate,Observe Data,Init Events,created等阶段。
   最后会调用mountComponent方法。
   ```
@@ -35,7 +40,6 @@
   ```
   这里会设置updateComponent方法。并添加新的watcher。这样一旦数据进行了更新就会调用updateComponent。而updateComponent会调用到render函数，
   而render函数里面会调用loadMore()，导致数据更新。如此循环。
-  
   
   
   
