@@ -41,7 +41,10 @@ GetIdentifierReference主要就是根据lex的环境记录找到对应标识符�
     }
     return inner;
   }
-  test();```
-  [在chrome中的实现](https://github.com/seulike/blog/blob/master/img/closure1.png)
-  在inner处断点调试，查看变量值，根据图可以看到函数对象上都有[[Scopes]],里面保存了闭包变量。inner与print的值相同。这应该是chrome的v8引擎的实现特点。
+  test();
+  ```
+  在inner处断点调试，查看变量值，根据图可以看到函数对象上都有[[Scopes]],里面保存了闭包变量。inner与print的值相同。
+  这应该是chrome的v8引擎的实现特点。 
+  ![在chrome中的实现](https://github.com/seulike/blog/blob/master/img/closure1.png)
+  
  
