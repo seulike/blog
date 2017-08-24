@@ -14,7 +14,31 @@
 对于这一问题可看[知乎](https://www.zhihu.com/question/23028843)
 process.nextTick的[实现代码](https://github.com/nodejs/node/blob/master/lib/internal/process/next_tick.js#L49)
 process.nextTick是node中实现的api，而promise的相关操作由v8来实现。
-在node的是事件循环中
+
+node在初始化运行时，会加载运行(/lib/internal/bootstrap_node.js)。
+其中会加载运行next_tick.js。
+```NativeModule.require('internal/process/next_tick').setup();```
+在setup方法中:
+```process.nextTick = nextTick;
+process._tickCallback = _tickCallback;
+const tickInfo = process._setupNextTick(_tickCallback, _runMicrotasks);
+  _runMicrotasks = _runMicrotasks.runMicrotasks;
+```
+设置了process.nextTick，这个即是使用的api。这里维护了一个NextTickQueue，会将设置的回调函数加入到队列中。
+由env->SetMethod(process, "_setupNextTick", SetupNextTick);
+可知这里会调用[SetupNextTick](https://github.com/nodejs/node/blob/master/src/node.cc#L1241)。
+```
+env->set_tick_callback_function(args[0].As<Function>());
+env->SetMethod(args[1].As<Object>(), "runMicrotasks", RunMicrotasks);
+```
+这里设置了tick_callback_function为_tickCallback，_runMicrotasks.runMicrotasks = RunMicrotasks;RunMicrotasks最终会调用v8的api,RunMicrotasks,用于执行所有的微任务。
+
+在node的事件循环中函数uv__io_poll是对添加到epoll中的io事件进行回调处理。
+这里的处理就如同用户代理处理macrotask一样。这些事件的最终执行[回调函数]
+(https://github.com/nodejs/node/blob/master/src/async-wrap.cc#L661)
+在执行完用户设置的回调函数后，会调用tick_callback_function。即已经在next_tick.js中设置好的函数[_tickCallback](https://github.com/nodejs/node/blob/master/lib/internal/process/next_tick.js#L151)。
+从nextTickQueue中不停取出数据并执行其callback，取出个数限制为1000。
+之后_runMicrotasks，执行所有的微任务。
 
 
 
