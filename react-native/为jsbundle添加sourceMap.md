@@ -1,4 +1,4 @@
-##前言  
+## 前言  
 一般react-native项目中会使用sentry或者接入友盟来获取报错日志。
 由于rn中打包后的js都是压缩过的代码，这里面的报错信息行列的定位都是对于压缩后的代码。
 因而需要sourceMap来将错误定位到项目的源代码的位置。rn一般默认没有sourceMap，因而需要做一定的设置
@@ -27,6 +27,28 @@ export NODE_BINARY=node
 export BUNDLE_CONFIG="./sourceMap/null_config --sourcemap-output ./sourceMap/sourcemap.ios.js"
 ../node_modules/react-native/scripts/react-native-xcode.sh
 ```
+原因在于，在打包jsbundle的时react-native-xcode.sh。sh中的打包命令是：
+```
+$NODE_BINARY $CLI_PATH $BUNDLE_COMMAND \
+  $CONFIG_ARG \
+  --entry-file "$ENTRY_FILE" \
+  --platform ios \
+  --dev $DEV \
+  --reset-cache \
+  --bundle-output "$BUNDLE_FILE" \
+  --assets-dest "$DEST"
+  ```
+  会使用到参数$CONFIG_ARG：
+  ```
+  if [[ -z "$BUNDLE_CONFIG" ]]; then
+  CONFIG_ARG=""
+else
+  CONFIG_ARG="--config $(pwd)/$BUNDLE_CONFIG"
+fi
+```
+因此可以巧妙的把--sourcemap-output参数加到$BUNDLE_CONFIG中，从而加到了$BUNDLE_COMMAND的参数中。
+当然完全也可以在react-native-xcode.sh脚本中直接把--sourcemap-output参数加入进来。
+
 
 ## 查找代码位置
 通过上面的配置方法，以后在对android和ios打包的时候会在项目目录的sourceMap下生成对应的sourcemap文件。
